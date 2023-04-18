@@ -1,0 +1,1 @@
+cmd_/home/knghia/dev/driver/sysfs/Module.symvers :=  sed 's/ko$$/o/'  /home/knghia/dev/driver/sysfs/modules.order | scripts/mod/modpost -m -a    -o /home/knghia/dev/driver/sysfs/Module.symvers -e -i Module.symvers -T - 

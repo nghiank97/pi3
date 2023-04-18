@@ -1,0 +1,1 @@
+cmd_/home/knghia/dev/driver/uart/Module.symvers :=  sed 's/ko$$/o/'  /home/knghia/dev/driver/uart/modules.order | scripts/mod/modpost -m -a    -o /home/knghia/dev/driver/uart/Module.symvers -e -i Module.symvers -T - 

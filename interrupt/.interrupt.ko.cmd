@@ -1,0 +1,1 @@
+cmd_/home/knghia/dev/driver/interrupt/interrupt.ko := ld -r -EL -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/knghia/dev/driver/interrupt/interrupt.ko /home/knghia/dev/driver/interrupt/interrupt.o /home/knghia/dev/driver/interrupt/interrupt.mod.o;  true

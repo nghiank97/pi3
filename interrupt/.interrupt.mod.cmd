@@ -1,0 +1,1 @@
+cmd_/home/knghia/dev/driver/interrupt/interrupt.mod := printf '%s\n'   interrupt.o | awk '!x[$$0]++ { print("/home/knghia/dev/driver/interrupt/"$$0) }' > /home/knghia/dev/driver/interrupt/interrupt.mod

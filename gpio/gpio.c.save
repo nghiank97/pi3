@@ -1,0 +1,95 @@
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/err.h>
+
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/err.h>
+
+#define PHYSICAL_ADD_START      0x20200000
+ + 0x50)
+
+#define GPFEN0_ADD          (PHYSICAL_ADD_START + 0x58)
+#define GPFEN1_ADD          (PHYSICAL_ADD_START + 0x5C)
+
+#define GPHEN0_ADD          (PHYSICAL_ADD_START + 0x64)
+#define GPHEN1_ADD          (PHYSICAL_ADD_START + 0x68)
+
+#define GPLEN0_ADD          (PHYSICAL_ADD_START + 0x70)
+#define GPLEN1_ADD          (PHYSICAL_ADD_START + 0x74)
+
+#define GPAREN0_ADD         (PHYSICAL_ADD_START + 0x7C)
+#define GPAREN1_ADD         (PHYSICAL_ADD_START + 0x80)
+
+#define GPAFEN0_ADD         (PHYSICAL_ADD_START + 0x88)
+#define GPAFEN1_ADD         (PHYSICAL_ADD_START + 0x8C)
+
+#define GPPUD_ADD           (PHYSICAL_ADD_START + 0x94)
+#define GPPUDCLK0_ADD       (PHYSICAL_ADD_START + 0x98)
+#define GPPUDCLK1_ADD       (PHYSICAL_ADD_START + 0x9C)
+
+#define GPFSEL0              (*(volatile uint32_t*)GPFSEL0_ADD)
+#define GPFSEL1              (*(volatile uint32_t*)GPFSEL1_ADD)
+#define GPFSEL2              (*(volatile uint32_t*)GPFSEL2_ADD)
+#define GPFSEL3              (*(volatile uint32_t*)GPFSEL3_ADD)
+#define GPFSEL4              (*(volatile uint32_t*)GPFSEL4_ADD)
+#define GPFSEL5              (*(volatile uint32_t*)GPFSEL5_ADD)
+
+#define GPSET0               (*(volatile uint32_t*)GPSET0_ADD)
+#define GPSET1               (*(volatile uint32_t*)GPSET1_ADD)
+
+#define GPCLR0               (*(volatile uint32_t*)GPCLR0_ADD)
+#define GPCLR1               (*(volatile uint32_t*)GPCLR1_ADD)
+
+#define GPLEV0               (*(volatile uint32_t*)GPLEV0_ADD)
+#define GPLEV1               (*(volatile uint32_t*)GPLEV1_ADD)
+
+#define GPEDS0               (*(volatile uint32_t*)GPEDS0_ADD)
+#define GPEDS1               (*(volatile uint32_t*)GPEDS1_ADD)
+
+#define GPREN0               (*(volatile uint32_t*)GPREN0_ADD)
+#define GPREN1               (*(volatile uint32_t*)GPREN1_ADD)
+
+#define GPFEN0               (*(volatile uint32_t*)GPFEN0_ADD)
+#define GPFEN1               (*(volatile uint32_t*)GPFEN1_ADD)
+#define GPHEN0               (*(volatile uint32_t*)GPHEN0_ADD)
+#define GPHEN1               (*(volatile uint32_t*)GPHEN1_ADD)
+
+#define GPLEN0               (*(volatile uint32_t*)GPLEN0_ADD)
+#define GPLEN1               (*(volatile uint32_t*)GPLEN1_ADD)
+
+#define GPAREN0              (*(volatile uint32_t*)GPAREN0_ADD)
+#define GPAREN1              (*(volatile uint32_t*)GPAREN1_ADD)
+
+#define GPAFEN0              (*(volatile uint32_t*)GPAFEN0_ADD)
+#define GPAFEN1              (*(volatile uint32_t*)GPAFEN1_ADD)
+
+#define GPPUD                (*(volatile uint32_t*)GPPUD_ADD)
+#define GPPUDCLK0            (*(volatile uint32_t*)GPPUDCLK0_ADD)
+#define GPPUDCLK1            (*(volatile uint32_t*)GPPUDCLK1_ADD)
+
+
+#define LED_ON()             (GPSET0 |= (1<<8))
+#define LED_OFF()            (GPSET0 &=~ (1<<8))
+
+static int __init start_module(void){
+	pr_info(": start \n");
+        /* config gpio 8 is output */
+        // GPFSEL0 |= (1<<24);
+	// LED_ON();
+	return 0;
+}
+static void __exit exit_module(void){
+	// LED_OFF();
+	pr_info(": end \n");
+}
+
+module_init(start_module);
+module_exit(exit_module);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("knghia");
+MODULE_VERSION("0:0.1");
+
