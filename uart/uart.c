@@ -6,6 +6,14 @@
 #include <linux/delay.h>
 #include <asm/io.h>
 
+#define u08 uint8_t
+#define u16 uint16_t
+#define u32 uint32_t
+#define i08 int8_t
+#define i16 int16_t
+#define i32 int32_t
+#define f32 float
+
 #define BCM2835_PERI_BASE      (0x3F000000)
 #define GPIO_BASE              (BCM2835_PERI_BASE + 0x200000)
 
@@ -27,7 +35,7 @@
 #define IBRD     		0x24
 #define FBRD     		0x28
 #define LCRH     		0x2C	// the line control register
-#define CR     		0x30	// control register
+#define CR     			0x30	// control register
 
 #define IFLS     		0x34
 #define IMSC     		0x38
@@ -98,6 +106,19 @@ bool uart_init(void){
 	return true;
 }
 
+void uart_byte(u08 ch){
+	uart[DR/4] &=~ 0xFF;
+	uart[DR/4] |= ch;
+	// wait the end of transmission
+        while((uart[FR/4]&(1<<7)) != 0x00);
+}
+
+void uart_print(u08 *data, u16 len){
+	for(u16 i=0;i<len;i++){
+		uart_byte(data[i]);
+	}
+}
+
 static int __init module_start(void){
 
 	pr_info(": start\n");
@@ -112,7 +133,10 @@ static int __init module_start(void){
 		return -1;
 	}
 
-	pr_info("%d",FUARTCLK);
+	pr_info("%d \n",FUARTCLK);
+	for(u16 i=0;i<10;i++){
+		uart_print("nghia\r\n",7);
+	}
 	return 0;
 }
 
