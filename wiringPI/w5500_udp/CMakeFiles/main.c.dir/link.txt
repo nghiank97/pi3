@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmain.c.a CMakeFiles/main.c.dir/socket.c.o CMakeFiles/main.c.dir/w5500.c.o
+/usr/bin/ranlib libmain.c.a

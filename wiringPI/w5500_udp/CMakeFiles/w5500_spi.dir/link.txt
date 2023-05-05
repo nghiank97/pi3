@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/w5500_spi.dir/main.c.o CMakeFiles/w5500_spi.dir/socket.c.o CMakeFiles/w5500_spi.dir/w5500.c.o -o w5500_spi  -lwiringPi 
