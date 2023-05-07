@@ -11,7 +11,8 @@
 #include "wiringPiSPI.h"
 #include "binary.h"
 #include "main.h"
-
+#include "w5500.h"
+#include "socket.h"
 
 extern void setup(void);
 extern void loop(void);
