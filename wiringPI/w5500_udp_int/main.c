@@ -127,14 +127,15 @@ extern void loop(){
 	u08 s = getSn_SR(0);
 	switch(s){
 		case SOCK_UDP:
-      len=getSn_RX_RSR(0);
+			len=getSn_RX_RSR(0);
 			if(len>0){
-        if (check == 1){ 
-  				memset(buffer,0,len+1);
-  				recvfrom(0,buffer, len, remote_ip,&remote_port);
-  				sendto(0,buffer,len, remote_ip, remote_port);
-          check = 0;
-        }
+				if (check == 1){ 
+  					memset(buffer,0,len+1);
+  					recvfrom(0,buffer, len, remote_ip,&remote_port);
+  					printf("%s \r\n", buffer);
+					sendto(0,buffer,len, remote_ip, remote_port);
+					check = 0;
+				}
 			}
 			if(getSn_IR(0) & Sn_IR_RECV){
 				setSn_IR(0, Sn_IR_RECV);

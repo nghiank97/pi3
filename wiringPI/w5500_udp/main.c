@@ -107,6 +107,10 @@ extern void setup(){
 	printf("sn: %03d.%03d.%03d.%03d\r\n", net_sub[0], net_sub[1], net_sub[2], net_sub[3]);
 	printf("gw: %03d.%03d.%03d.%03d\r\n", net_gw[0], net_gw[1], net_gw[2], net_gw[3]);
 	printf("mac: %02x.%02x.%02x.%02x.%02x.%02x\r\n", net_mac[0], net_mac[1], net_mac[2], net_mac[3], net_mac[4], net_mac[5]);
+	printf("local port : %d \r\n",local_port);
+	printf("remote ip : %03d.%03d.%03d.%03d\r\n",remote_ip[0], remote_ip[1], remote_ip[2], remote_ip[3]);
+	printf("remote port : %d \r\n",remote_port);
+
 #endif
 }
 
@@ -121,6 +125,7 @@ extern void loop(){
 			if(len>0){
 				memset(buffer,0,len+1);
 				recvfrom(0,buffer, len, remote_ip,&remote_port);
+				printf("%s \n",buffer);
 				sendto(0,buffer,len, remote_ip, remote_port);
 			}
 			break;

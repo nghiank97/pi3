@@ -67,10 +67,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/knghia/dev/pi3/wiringPI/w5500_udp_int
+CMAKE_SOURCE_DIR = /home/knghia/dev/pi3/wiringPI/w5500_udp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/knghia/dev/pi3/wiringPI/w5500_udp_int
+CMAKE_BINARY_DIR = /home/knghia/dev/pi3/wiringPI/w5500_udp
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/knghia/dev/pi3/wiringPI/w5500_udp_int/CMakeFiles /home/knghia/dev/pi3/wiringPI/w5500_udp_int//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/knghia/dev/pi3/wiringPI/w5500_udp/CMakeFiles /home/knghia/dev/pi3/wiringPI/w5500_udp//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/knghia/dev/pi3/wiringPI/w5500_udp_int/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/knghia/dev/pi3/wiringPI/w5500_udp/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -143,17 +143,17 @@ main.c/fast:
 .PHONY : main.c/fast
 
 #=============================================================================
-# Target rules for targets named w5500_udp_int
+# Target rules for targets named w5500_udp
 
 # Build rule for target.
-w5500_udp_int: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 w5500_udp_int
-.PHONY : w5500_udp_int
+w5500_udp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 w5500_udp
+.PHONY : w5500_udp
 
 # fast build rule for target.
-w5500_udp_int/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/build
-.PHONY : w5500_udp_int/fast
+w5500_udp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/build
+.PHONY : w5500_udp/fast
 
 main.o: main.c.o
 
@@ -161,7 +161,7 @@ main.o: main.c.o
 
 # target to build an object file
 main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/main.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/main.c.o
 .PHONY : main.c.o
 
 main.i: main.c.i
@@ -170,7 +170,7 @@ main.i: main.c.i
 
 # target to preprocess a source file
 main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/main.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/main.c.i
 .PHONY : main.c.i
 
 main.s: main.c.s
@@ -179,7 +179,7 @@ main.s: main.c.s
 
 # target to generate assembly for a file
 main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/main.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/main.c.s
 .PHONY : main.c.s
 
 socket.o: socket.c.o
@@ -189,7 +189,7 @@ socket.o: socket.c.o
 # target to build an object file
 socket.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/socket.c.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/socket.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/socket.c.o
 .PHONY : socket.c.o
 
 socket.i: socket.c.i
@@ -199,7 +199,7 @@ socket.i: socket.c.i
 # target to preprocess a source file
 socket.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/socket.c.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/socket.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/socket.c.i
 .PHONY : socket.c.i
 
 socket.s: socket.c.s
@@ -209,7 +209,7 @@ socket.s: socket.c.s
 # target to generate assembly for a file
 socket.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/socket.c.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/socket.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/socket.c.s
 .PHONY : socket.c.s
 
 w5500.o: w5500.c.o
@@ -219,7 +219,7 @@ w5500.o: w5500.c.o
 # target to build an object file
 w5500.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/w5500.c.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/w5500.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/w5500.c.o
 .PHONY : w5500.c.o
 
 w5500.i: w5500.c.i
@@ -229,7 +229,7 @@ w5500.i: w5500.c.i
 # target to preprocess a source file
 w5500.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/w5500.c.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/w5500.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/w5500.c.i
 .PHONY : w5500.c.i
 
 w5500.s: w5500.c.s
@@ -239,7 +239,7 @@ w5500.s: w5500.c.s
 # target to generate assembly for a file
 w5500.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/w5500.c.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/w5500.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/w5500.c.s
 .PHONY : w5500.c.s
 
 wizchip_conf.o: wizchip_conf.c.o
@@ -249,7 +249,7 @@ wizchip_conf.o: wizchip_conf.c.o
 # target to build an object file
 wizchip_conf.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/wizchip_conf.c.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/wizchip_conf.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/wizchip_conf.c.o
 .PHONY : wizchip_conf.c.o
 
 wizchip_conf.i: wizchip_conf.c.i
@@ -259,7 +259,7 @@ wizchip_conf.i: wizchip_conf.c.i
 # target to preprocess a source file
 wizchip_conf.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/wizchip_conf.c.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/wizchip_conf.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/wizchip_conf.c.i
 .PHONY : wizchip_conf.c.i
 
 wizchip_conf.s: wizchip_conf.c.s
@@ -269,7 +269,7 @@ wizchip_conf.s: wizchip_conf.c.s
 # target to generate assembly for a file
 wizchip_conf.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.c.dir/build.make CMakeFiles/main.c.dir/wizchip_conf.c.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp_int.dir/build.make CMakeFiles/w5500_udp_int.dir/wizchip_conf.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/w5500_udp.dir/build.make CMakeFiles/w5500_udp.dir/wizchip_conf.c.s
 .PHONY : wizchip_conf.c.s
 
 # Help Target
@@ -281,7 +281,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main.c"
-	@echo "... w5500_udp_int"
+	@echo "... w5500_udp"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
