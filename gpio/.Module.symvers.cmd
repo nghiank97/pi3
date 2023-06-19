@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/driver/gpio/Module.symvers :=  sed 's/ko$$/o/'  /home/knghia/dev/driver/gpio/modules.order | scripts/mod/modpost -m -a    -o /home/knghia/dev/driver/gpio/Module.symvers -e -i Module.symvers -T - 

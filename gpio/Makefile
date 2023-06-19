@@ -1,4 +1,3 @@
-
 file := gpio
 
 obj-m += $(file).o

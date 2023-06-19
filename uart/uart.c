@@ -1,3 +1,4 @@
+
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -135,7 +136,9 @@ static int __init module_start(void){
 
 	pr_info("%d \n",FUARTCLK);
 	for(u16 i=0;i<10;i++){
-		uart_print("nghia\r\n",7);
+		uart_print("hell0 world \r\n",14);
+		pr_info("hello world \r\n");
+    mdelay(200);
 	}
 	return 0;
 }

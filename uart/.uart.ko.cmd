@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/driver/uart/uart.ko := ld -r -EL -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/knghia/dev/driver/uart/uart.ko /home/knghia/dev/driver/uart/uart.o /home/knghia/dev/driver/uart/uart.mod.o;  true

@@ -1,53 +1,65 @@
-#include <linux/module.h>
+#include <linux/kernel.h>
 #include <linux/init.h>
-#include <linux/fs.h>
-#include <linux/cdev.h>
-#include <linux/uaccess.h>
-#include <linux/gpio.h>
+#include <linux/module.h>
+#include <linux/device.h>
+#include <linux/err.h>
 #include <linux/delay.h>
+#include <asm/io.h>
+
+#define GPIO_BASE      	0x3F200000
+
+#define BLOCK_SIZE 	0xB0
+#define GPFSEL0    	0x00
+#define GPFSEL1    	0x04
+#define GPFSEL2    	0x08
+#define GPSET0     	0x1C
+#define GPSET1		0x20
+#define GPCLR0     	0x28
+#define GPCLR1		0x2C
+
+#define GPPUD		0x94
+#define GPPUDCLK0	0x98
+#define GPPUDCLK1	0x9C
+
+
+volatile uint32_t *gpio;
+
+static int __init module_start(void){
+	pr_info(": start\n");
+	gpio = ioremap(GPIO_BASE, 0xB0);
+	if (gpio == NULL) {
+		pr_info("io remap failed\n");
+		iounmap(gpio);
+		return -1;
+	}
+	// config gpio 6
+	gpio[GPFSEL0/4] &=~ (7 << 18);
+	gpio[GPFSEL0/4] |= (1 << 18);
+
+	// config pull up
+	// gpio[GPPUD/4] &=~ (3<<12);
+	// gpio[GPPUD/4] |= (2<<12);
+	// gpio[GPPUDCLK0/4] |= (1<<6);
+	for(int i = 0; i < 5; i++){
+		gpio[GPSET0/4] |= (1 << 6);
+		pr_info("LED ON\n");
+		mdelay(1000);
+
+		gpio[GPCLR0/4] |= (1 << 6);
+		pr_info("LED OFF\n");
+		mdelay(1000);
+	}
+	return 0;
+}
+
+static void __exit module_end(void){
+	iounmap(gpio);
+	pr_info(": end\n");
+}
+
+module_init(module_start);
+module_exit(module_end);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("knghia");
-
-#define LED 6
-
-static int __init ModuleInit(void) {
-	printk("Hello, Kernel!\n");
-
-	/* GPIO 4 init */
-	if(gpio_request(LED, "rpi-gpio-6")) {
-		printk("Can not allocate GPIO 6\n");
-		goto Gpio4Error;
-	}
-	/* Set GPIO 4 direction */
-	if(gpio_direction_output(LED, 0)) {
-		printk("Can not set GPIO 6 to output!\n");
-		goto Gpio4Error;
-	}
-	for (int i=0;i<5;i++){
-		gpio_set_value(LED, 0);
-		printk("LED ON\n");
-		mdelay(1000);
-		gpio_set_value(LED, 1);
-		printk("LED OFF\n");
-		mdelay(1000);
-	}
-	
-	
-	return 0;
-Gpio4Error:
-	gpio_free(4);
-	return -1;
-}
-
-/**
- * @brief This function is called, when the module is removed from the kernel
- */
-static void __exit ModuleExit(void) {
-	gpio_set_value(4, 0);
-	gpio_free(4);
-	printk("Goodbye, Kernel\n");
-}
-
-module_init(ModuleInit);
-module_exit(ModuleExit);
+MODULE_VERSION("0:0.2");
