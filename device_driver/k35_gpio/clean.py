@@ -3,8 +3,7 @@ import os
 
 def main():
   all_file = os.listdir()
-  
-  no_delete = ["Makefile", "my_driver.c", "clean.py"]
+  no_delete = ["Makefile", "my_driver.c", "clean.py", "Image", "Readme.md"]
   
   for f in all_file:
     if f not in no_delete:

@@ -19,3 +19,11 @@ end:
 
 log:
 	dmesg | tail -n $(len)
+ 
+led_on:
+	sudo chmod 666 /dev/my_dev
+	echo 1 > /dev/my_dev
+  
+led_off:
+	sudo chmod 666 /dev/my_dev
+	echo 0 > /dev/my_dev
