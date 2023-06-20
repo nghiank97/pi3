@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/driver/timer/timer.ko := ld -r -EL -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/knghia/dev/driver/timer/timer.ko /home/knghia/dev/driver/timer/timer.o /home/knghia/dev/driver/timer/timer.mod.o;  true
