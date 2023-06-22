@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/driver/sysfs/sysfs.ko := ld -r -EL -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/knghia/dev/driver/sysfs/sysfs.ko /home/knghia/dev/driver/sysfs/sysfs.o /home/knghia/dev/driver/sysfs/sysfs.mod.o;  true
