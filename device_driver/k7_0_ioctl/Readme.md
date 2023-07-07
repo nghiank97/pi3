@@ -38,7 +38,7 @@ static struct file_operations fops ={
 };
 ```
 
-Access by the user space
+The ioctl is accessed by the user space
 
 ```c
 #define WR_VALUE _IOW('a','a',int32_t*)
@@ -48,9 +48,9 @@ ioctl(fd, WR_VALUE, (int32_t*) &number);
 ioctl(fd, RD_VALUE, (int32_t*) &value);
 ```
 
-# Note :
+# Note
 
 ```c
-(int32_t*) &number  // is a pointer which is “int32” pointer Otherwise
-(int32_t*) number == number
+(int32_t*) &number		// is address of the "value" variable
+(int32_t*) number		// is value of the "value" variable
 ```
