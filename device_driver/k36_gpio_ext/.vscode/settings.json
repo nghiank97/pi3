@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "module.h": "c",
+        "kdev_t.h": "c"
+    }
+}

@@ -1,17 +1,20 @@
 
-file := my_driver
+file := main
 
 obj-m += $(file).o
 KDIR = /lib/modules/$(shell uname -r)/build
-all:
+
+module:
 	make -C $(KDIR)  M=$(shell pwd) modules
 clean:
 	make -C $(KDIR)  M=$(shell pwd) clean
 
-start:
+start: module
 	sudo chmod 777 $(file).ko
 	sudo insmod $(file).ko
 	dmesg | tail -n 10
+	cat /proc/devices
+	
 
 end:
 	sudo rmmod $(file)

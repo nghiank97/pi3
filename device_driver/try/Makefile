@@ -21,10 +21,10 @@ log:
 	dmesg | tail -n $(len)
 
 write:
-	echo led_on> /proc/my_value
-	dmesg | tail -n 10
+	ls -l /proc/my_value
+	echo led_on > /proc/my_value
 
 read:
+	ls -l /proc/my_value
 	cat /proc/my_value
-	dmesg | tail -n 10
 
