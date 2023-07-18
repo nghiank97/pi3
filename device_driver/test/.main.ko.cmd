@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/pi3/device_driver/test/main.ko := ld -r -EL -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/knghia/dev/pi3/device_driver/test/main.ko /home/knghia/dev/pi3/device_driver/test/main.o /home/knghia/dev/pi3/device_driver/test/main.mod.o;  true

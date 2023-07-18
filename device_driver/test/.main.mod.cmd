@@ -1,1 +1,0 @@
-cmd_/home/knghia/dev/pi3/device_driver/test/main.mod := printf '%s\n'   main.o | awk '!x[$$0]++ { print("/home/knghia/dev/pi3/device_driver/test/"$$0) }' > /home/knghia/dev/pi3/device_driver/test/main.mod

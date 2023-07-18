@@ -1,30 +1,24 @@
-obj-m += main.o
-KDIR = /lib/modules/$(shell uname -r)/build
+obj-m += serdev_echo.o
+
+all: module dt
+	echo Builded Device Tree Overlay and kernel module
 
 module:
-	make -C $(KDIR) M=$(shell pwd) modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+dt: serdev_overlay.dts
+	dtc -@ -I dts -O dtb -o serdev_overlay.dtbo serdev_overlay.dts
 clean:
-	make -C $(KDIR) M=$(shell pwd) clean
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	rm -rf serdev_overlay.dtbo
+	
+start:module dt
+	sudo cp serdev_overlay.dtbo /boot/overlays
+	sudo dtoverlay serdev_overlay.dtbo
+	sudo insmod serdev_echo.ko
 
-file := main
 
-start: module
-	sudo chmod 777 $(file).ko
-	sudo insmod $(file).ko
-	dmesg | tail -n 10
-
-end: clean
-	sudo rmmod $(file)
-	dmesg | tail -n 5
+end: 
+	sudo rmmod serdev_echo.ko
 
 log:
 	dmesg | tail -n $(len)
-
-write:
-	echo led_on> /proc/my_value
-	dmesg | tail -n 10
-
-read:
-	cat /proc/my_value
-	dmesg | tail -n 10
-
