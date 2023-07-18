@@ -4,4 +4,4 @@
 
 [Linux_Driver_Tutorial](https://github.com/Johannes4Linux/Linux_Driver_Tutorial/tree/main)
 
-[Linux_Driver_Tutorial](https://github.com/PacktPublishing/Linux-Device-Drivers-Development/tree/master)
+[Linux-Device-Drivers-Development](https://github.com/PacktPublishing/Linux-Device-Drivers-Development/tree/master)
