@@ -1,5 +1,4 @@
 # Pinmap
-![image info](./pinmap.png)
 
 ![Embetronicx](https://github.com/Embetronicx/Tutorials/tree/master/Linux/Device_Driver)
 

@@ -1,2 +1,4 @@
 
-ls - l /proc/device-tree/my_device/green-led-gpio
+# 1 Diagram
+
+![image info](./image/Linux-device tree gpio.drawio.png)
