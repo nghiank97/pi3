@@ -1,4 +1,4 @@
 
-# 1 Diagram
+# 1 Connection
 
-![image info](./image/Linux-gpio.drawio.png)
+![image info](./image/encoder_pi3.jpg)

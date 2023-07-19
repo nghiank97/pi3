@@ -1,0 +1,16 @@
+
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "brcm,bcm2835";
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			encoder_device {
+				compatible = "encoder,pi3";
+				encoder_gpios = <&gpio 20 1>, <&gpio 16 1>, <&gpio 12 1>; // A,B,Z
+				resolution = <4000>;
+			};
+		};
+	};
+};
