@@ -1,5 +1,5 @@
 # Pinmap
-![image info](./image/pi3_pinmap.png)
+![image info](./image/pinmap.png)
 # Structure
 
 ![image info](./image/structure_1.png)
