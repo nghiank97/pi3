@@ -1,4 +1,4 @@
-# Pinmap
+# Link
 
 [Embetronicx](https://github.com/Embetronicx/Tutorials/tree/master/Linux/Device_Driver)
 
