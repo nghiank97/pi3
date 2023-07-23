@@ -1,32 +1,31 @@
 
-obj-m += main.o
-KDIR = /lib/modules/$(shell uname -r)/build
-
-all:
-	make -C $(KDIR) M=$(shell pwd) modules
-clean:
-	make -C $(KDIR)M=$(shell pwd) clean
-
 file := main
+obj-m += $(file).o
 
-start:
+module:
+	make -C /lib/modul
+	es/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+
+start: module
 	sudo chmod 777 $(file).ko
 	sudo insmod $(file).ko
-	dmesg | tail -n 10
-
-end:
-	sudo rmmod $(file)
-	dmesg | tail -n 5
-
-log:
-	dmesg | tail -n $(len)
- 
-show:
 	sudo chmod 777 /sys/kernel/etx_sysfs/etx_value
+
+end: clean
+	sudo rmmod $(file).ko
+
+log: 
+	dmesg | tail -n $(len)
+
+write:
+	sudo echo 123 > /sys/kernel/etx_sysfs/etx_value
+read:
 	cat /sys/kernel/etx_sysfs/etx_value
  
-write:
-	echo 123 > /sys/kernel/etx_sysfs/etx_value
- 
-clean:
-	python3 clean.py
+
+test:
+	gcc -o read.o read.c
+	./read.o
