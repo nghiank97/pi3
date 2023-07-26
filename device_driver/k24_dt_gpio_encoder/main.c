@@ -1,7 +1,6 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
-#include <linux/module.h>
 #include <linux/kdev_t.h>
 #include <linux/fs.h>
 #include <linux/cdev.h>
@@ -15,22 +14,26 @@
 #include <linux/proc_fs.h>
 #include <linux/slab.h> // kmalloc
 
-#define GPIO_16_IN      16
-#define GPIO_20_IN      20
-#define GPIO_21_OUT     21
-#define GPIO_26_OUT     26
+#include <linux/module.h>
+#include <linux/moduleparam.h>
 
+#define PROC_DIR_NAME   "encoder"
+#define PROC_VALUE      "value"
+
+#define GPIO_A_IN      17
+#define GPIO_B_IN      27
+#define GPIO_Z_IN      22
+
+static struct proc_dir_entry* encoder_dir = NULL;
 unsigned int encoder_a_irq;
 unsigned int encoder_b_irq;
+unsigned int encoder_z_irq;
+
+int64_t rotion = 0;
 int64_t pulse = 0;
 
 static irqreturn_t encoder_a_irq_handler(int irq,void *dev_id) {
-  static int a = 1;
-  int state = gpio_get_value(GPIO_20_IN);
-
-  a ^= 1;
-  gpio_set_value(GPIO_21_OUT,a);
-
+  int state = gpio_get_value(GPIO_B_IN);
   if (state == 1){
     pulse +=1;
   }
@@ -41,11 +44,7 @@ static irqreturn_t encoder_a_irq_handler(int irq,void *dev_id) {
 }
 
 static irqreturn_t encoder_b_irq_handler(int irq,void *dev_id) {
-  static int b = 1;
-  int state = gpio_get_value(GPIO_16_IN);
-  
-  b ^= 1;
-  gpio_set_value(GPIO_26_OUT,b);
+  int state = gpio_get_value(GPIO_A_IN);
   if (state == 0){
     pulse +=1;
   }
@@ -55,25 +54,30 @@ static irqreturn_t encoder_b_irq_handler(int irq,void *dev_id) {
   return IRQ_HANDLED;
 }
 
-char* rx_data;
-
-ssize_t proc_fos_read(struct file *File, char *user, size_t count, loff_t *offs){
-  int ret;
-  size_t len = 0;
+static irqreturn_t encoder_z_irq_handler(int irq,void *dev_id) {
+  static int64_t p = 0;
+  static int64_t p_p = 0;
   
-  len = sprintf(rx_data,"%lld",pulse);
-  ret = copy_to_user(user, rx_data, len);
-  printk("  pulse %s \n",user);
-  return ret;
+  p = pulse;
+  if (p >= p_p)
+    rotion+=1;
+  else{
+    rotion-=1;
+  }
+  return IRQ_HANDLED;
 }
 
-ssize_t proc_fos_write(struct file *File, const char *user, size_t count, loff_t *offs){
-  return count;
+ssize_t proc_fs_read(struct file* filep, char* __user u_buffer, size_t len, loff_t* offset){
+  ssize_t len_msg = 0;
+  len_msg = sprintf(u_buffer,"%lld %lld\n",pulse,rotion);
+  if(len_msg > 0){
+    return len_msg;
+  }
+  return 0;
 }
  
-struct proc_ops proc_fos = {
-  .proc_read = proc_fos_read,
-  .proc_write = proc_fos_write,
+struct proc_ops proc_fs = {
+  .proc_read = proc_fs_read
 };
 
 dev_t dev = 0;
@@ -106,57 +110,46 @@ static int __init etx_driver_init(void){
     goto r_device;
   }
 
-  //Output GPIO configuration
-  //Checking the GPIO is valid or not
-  if(gpio_is_valid(GPIO_21_OUT) == false){
-    pr_err("    GPIO %d is not valid\n", GPIO_21_OUT);
+  //  Encoder a pin configuration
+  if(gpio_is_valid(GPIO_A_IN) == false){
+    pr_err("    GPIO %d is not valid\n", GPIO_A_IN);
     goto r_device;
   }
-  if(gpio_request(GPIO_21_OUT,"GPIO_20_IN") < 0){
-    pr_err("    ERROR: GPIO %d request\n", GPIO_21_OUT);
+  if(gpio_request(GPIO_A_IN,"GPIO_A_IN") < 0){
+    pr_err("    ERROR: GPIO %d request\n", GPIO_A_IN);
     goto r_gpio_in;
   }
-  gpio_direction_output(GPIO_21_OUT,1);
+  gpio_direction_input(GPIO_A_IN);
 
-  if(gpio_is_valid(GPIO_26_OUT) == false){
-    pr_err("    GPIO %d is not valid\n", GPIO_26_OUT);
-    goto r_device;
-  }
-  if(gpio_request(GPIO_26_OUT,"GPIO_26_OUT") < 0){
-    pr_err("    ERROR: GPIO %d request\n", GPIO_26_OUT);
+  //  Encoder b pin configuration
+  if(gpio_is_valid(GPIO_B_IN) == false){
+    pr_err("    GPIO %d is not valid\n", GPIO_B_IN);
     goto r_gpio_in;
   }
-  gpio_direction_output(GPIO_26_OUT,1);
-
-  //Output GPIO configuration
-  //Checking the GPIO is valid or not
-  if(gpio_is_valid(GPIO_20_IN) == false){
-    pr_err("    GPIO %d is not valid\n", GPIO_20_IN);
-    goto r_device;
-  }
-  if(gpio_request(GPIO_20_IN,"GPIO_20_IN") < 0){
-    pr_err("    ERROR: GPIO %d request\n", GPIO_20_IN);
+  if(gpio_request(GPIO_B_IN,"GPIO_B_IN") < 0){
+    pr_err("    ERROR: GPIO %d request\n", GPIO_B_IN);
     goto r_gpio_in;
   }
-  gpio_direction_input(GPIO_20_IN);
-
-  //Input GPIO configuratioin
-  //Checking the GPIO is valid or not
-  if(gpio_is_valid(GPIO_16_IN) == false){
-    pr_err("    GPIO %d is not valid\n", GPIO_16_IN);
+  gpio_direction_input(GPIO_B_IN);
+  
+  //  Encoder z pin configuration
+  if(gpio_is_valid(GPIO_Z_IN) == false){
+    pr_err("    GPIO %d is not valid\n", GPIO_Z_IN);
     goto r_gpio_in;
   }
-  if(gpio_request(GPIO_16_IN,"GPIO_16_IN") < 0){
-    pr_err("    ERROR: GPIO %d request\n", GPIO_16_IN);
+  if(gpio_request(GPIO_Z_IN,"GPIO_B_IN") < 0){
+    pr_err("    ERROR: GPIO %d request\n", GPIO_Z_IN);
     goto r_gpio_in;
   }
-  gpio_direction_input(GPIO_16_IN);
+  gpio_direction_input(GPIO_Z_IN);
 
   //Get the IRQ number for our GPIO
-  encoder_a_irq = gpio_to_irq(GPIO_16_IN);
-  encoder_b_irq = gpio_to_irq(GPIO_20_IN);
+  encoder_a_irq = gpio_to_irq(GPIO_A_IN);
+  encoder_b_irq = gpio_to_irq(GPIO_B_IN);
+  encoder_z_irq = gpio_to_irq(GPIO_Z_IN);
   pr_info("    encoder_a_irq = %d\n", encoder_a_irq);
   pr_info("    encoder_b_irq = %d\n", encoder_b_irq);
+  pr_info("    encoder_z_irq = %d\n", encoder_z_irq);
   
   if (request_irq(encoder_a_irq,
                   (void *)encoder_a_irq_handler,
@@ -174,20 +167,35 @@ static int __init etx_driver_init(void){
     pr_err("    my_device: cannot register IRQ ");
     goto r_gpio_in;
   }
+  if (request_irq(encoder_z_irq,
+                  (void *)encoder_z_irq_handler,
+                  IRQF_TRIGGER_FALLING, 
+                  "etx_device", 
+                  NULL)) {
+    pr_err("    my_device: cannot register IRQ ");
+    goto r_gpio_in;
+  }
   
-  if (proc_create("my_value", 0666, NULL, &proc_fos) == NULL){
-    printk("    Can't create a proc in file\n");
+
+  encoder_dir = proc_mkdir(PROC_DIR_NAME, NULL);
+  if(!encoder_dir){
+    proc_remove(encoder_dir);  
     return -1;
   }
 
-  rx_data = (char*)kmalloc(256, GFP_KERNEL);
-
+  if (!proc_create(PROC_VALUE, 0666, encoder_dir, &proc_fs)){
+    printk("    Can't create a proc in file\n");
+    remove_proc_entry(PROC_VALUE, NULL);
+    return -1;
+  }
+  
   pr_info("    Done!!!\n");
   return 0;
 
 r_gpio_in:
-  gpio_free(GPIO_16_IN);
-  gpio_free(GPIO_20_IN);
+  gpio_free(GPIO_A_IN);
+  gpio_free(GPIO_B_IN);
+  gpio_free(GPIO_Z_IN);
 r_device:
   device_destroy(dev_class,dev);
 r_class:
@@ -202,14 +210,14 @@ r_unreg:
 /*
 ** Module exit function
 */
-static void __exit etx_driver_exit(void)
-{
-  kfree(rx_data);
-  remove_proc_entry("my_value",NULL);
+static void __exit etx_driver_exit(void){
+  remove_proc_entry(PROC_VALUE, NULL);
+  proc_remove(encoder_dir);
   free_irq(encoder_a_irq, NULL);
   free_irq(encoder_b_irq, NULL);
-  gpio_free(GPIO_16_IN);
-  gpio_free(GPIO_20_IN);
+  gpio_free(GPIO_A_IN);
+  gpio_free(GPIO_B_IN);
+  gpio_free(GPIO_Z_IN);
   device_destroy(dev_class,dev);
   class_destroy(dev_class);
   cdev_del(&etx_cdev);
@@ -221,6 +229,6 @@ module_init(etx_driver_init);
 module_exit(etx_driver_exit);
  
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("EmbeTronicX <embetronicx@gmail.com>");
-MODULE_DESCRIPTION("A simple device driver - GPIO Driver (GPIO Interrupt) ");
-MODULE_VERSION("1.33");
+MODULE_AUTHOR("knghia");
+MODULE_DESCRIPTION("read encoder");
+MODULE_VERSION("0.1");
