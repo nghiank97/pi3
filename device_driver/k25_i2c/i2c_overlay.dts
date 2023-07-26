@@ -1,0 +1,17 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "brcm,bcm2835";
+	fragment@0 {
+		target = <&i2c1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			lsm303dlhc: lsm303dlhc@1e {
+				compatible = "brightlight,lsm303dlhc";
+				reg = <0x1e>;
+				status = "okay";
+			};
+		};
+	};
+};
