@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "kdev_t.h": "c",
+        "fs.h": "c",
+        "kernel.h": "c",
+        "module.h": "c"
+    }
+}
