@@ -21,12 +21,10 @@ end: clean
 log:
 	sudo dmesg | tail -n $(len)
 
-write:
-	sudo chmod 777 /dev/etx_device
-	sudo echo 1 > /dev/etx_device
-	sudo dmesg | tail -n 5
-
 read:
 	sudo chmod 777 /dev/etx_device
-	sudo cat /dev/etx_device
-	sudo dmesg | tail -n 5
+	gcc -Wall read.c -o read.exe
+	./read.exe
+ 
+gui:
+	python3 gui.py
