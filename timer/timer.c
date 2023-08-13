@@ -9,25 +9,25 @@
 #include <linux/jiffies.h>
 #include <linux/err.h>
 
-#define TIMEOUT 1000
-static struct timer_list etx_timer;
+#define TIME_CYCLE 2000
+static struct timer_list timer_0;
 static unsigned int count = 0;
 
 void timer_callback(struct timer_list* data){
-	pr_info(": count %d",count++);
-	mod_timer(&etx_timer, jiffies + msecs_to_jiffies(TIMEOUT));
+	pr_info("\t count %d \n",count++);
+	mod_timer(&timer_0, jiffies + msecs_to_jiffies(TIME_CYCLE));
 }
 
 static int __init module_start(void){
-	pr_info(": start");
-	timer_setup(&etx_timer, timer_callback, 0);
-	mod_timer(&etx_timer, jiffies + msecs_to_jiffies(TIMEOUT));
+	pr_info("\t start \n");
+	timer_setup(&timer_0, timer_callback, 0);
+	mod_timer(&timer_0, jiffies + msecs_to_jiffies(TIME_CYCLE));
 	return 0;
 }
 
 static void __exit module_end(void){
-	del_timer(&etx_timer);
-	pr_info(": end");
+	del_timer(&timer_0);
+	pr_info("\t end \n");
 }
 
 module_init(module_start);
