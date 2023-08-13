@@ -7,27 +7,32 @@
 #include <linux/platform_device.h>
 
 #define PWM_NAME 		"pwm_test"
-#define LED_NAME 		"led_test"
-#define PWM_PERIOD_NS 	400000 	// 	25k
-#define PWM_DUTY_NS 	200000 	// 	1ms
+#define PWM_PERIOD_NS 	40000 	// 	25k
+#define PWM_DUTY_NS 	20000 	// 	1ms
 
 static struct pwm_device *pwm;
 
 static int pwm_probe(struct platform_device *pdev){
     int ret;
-    pwm = pwm_request(0, PWM_NAME);
+    const char *label;
+    struct device *dev = &pdev->dev;
+    
+    pwm = pwm_get(dev, "pwm_led,dev");
     if (IS_ERR(pwm)) {
-        dev_err(&pdev->dev, "failed to request PWM\n");
-        return PTR_ERR(pwm);
+        return -1;
     }
-    ret = pwm_config(pwm, PWM_DUTY_NS, PWM_PERIOD_NS);
+    ret = pwm_config(pwm, PWM_PERIOD_NS, PWM_PERIOD_NS);
     if (ret < 0) {
-        dev_err(&pdev->dev, "failed to configure PWM\n");
-        goto err_release_pwm;
+        goto r_pwm;
     }
     pwm_enable(pwm);
+
+	ret = device_property_read_string(dev, "status", &label);
+	if(ret) {
+		return -1;
+	}
     return 0;
-err_release_pwm:
+r_pwm:
     pwm_free(pwm);
     return ret;
 }
@@ -39,31 +44,21 @@ static int pwm_remove(struct platform_device *pdev){
     return 0;
 }
 
+static struct of_device_id pwm_ids[] = {
+	{
+		.compatible = "pwm_led,dev",
+	}, { /* sentinel */ }
+};
+MODULE_DEVICE_TABLE(of, pwm_ids);
 static struct platform_driver pwm_driver = {
-    .driver = {
-        .name = LED_NAME,
-    },
     .probe = pwm_probe,
     .remove = pwm_remove,
+    .driver = {
+        .name = PWM_NAME,
+        .of_match_table = of_match_ptr(pwm_ids),
+    },
 };
 
-static int __init etx_driver_init(void){
-    int ret;
-    ret = platform_driver_register(&pwm_driver);
-    if (ret < 0) {
-        pr_err("\t failed to register PWM platform driver\n");
-        return ret;
-    }
-	pr_info("\t inserted\n");
-    return 0;
-}
-
-static void __exit etx_driver_exit(void){
-    platform_driver_unregister(&pwm_driver);
-	pr_info("\t exit\n");
-}
-
-module_init(etx_driver_init);
-module_exit(etx_driver_exit);
+module_platform_driver(pwm_driver);
 
 MODULE_LICENSE("GPL");

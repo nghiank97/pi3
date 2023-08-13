@@ -1,0 +1,20 @@
+
+/*
+ * Device tree overlay for pwm
+ */
+
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "brcm,bcm2835";
+	fragment@0 {
+		target = <&soc>;
+		__overlay__ {
+			pwm_led {
+				compatible = "pwm_led,dev";
+                pwms  = <&pwm 0 40000>;
+				status = "okay";
+			};
+		};
+	};
+};
