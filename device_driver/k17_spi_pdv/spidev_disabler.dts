@@ -1,0 +1,23 @@
+/dts-v1/;
+/plugin/;
+/ {
+    compatible = "brcm,bcm2835";
+    fragment@0 {
+        target = <&spidev0>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+	fragment@1 {
+		target-path = "/";
+		__overlay__ {
+			tft_gpio {
+				compatible = "tft,gpio";
+                status = "okay";
+                tft_a0 = <&gpio 25 1>; 
+                tft_rst = <&gpio 7 1>;  
+
+			};
+		};
+	};
+};
