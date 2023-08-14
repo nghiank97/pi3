@@ -87,10 +87,19 @@
 #define ST7735_GMCTRP1 0xE0
 #define ST7735_GMCTRN1 0xE1
 
+#define A0_pin	25
 #define CS0_pin 8
+#define RST_pin 7
 
 #define CS_H()       		(gpio_set_value(CS0_pin,1))
 #define CS_L()      		(gpio_set_value(CS0_pin,0))
+
+#define A0_H()       		(gpio_set_value(A0_pin,1))
+#define A0_L()      		(gpio_set_value(A0_pin,0))
+
+#define RST_H()       		(gpio_set_value(RST_pin,1))
+#define RST_L()      		(gpio_set_value(RST_pin,0))
+
 
 typedef enum {
 	scr_normal = 0,
