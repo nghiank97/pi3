@@ -1,3 +1,9 @@
+
+
+/*
+ * Device tree overlay for spi
+ */
+
 /dts-v1/;
 /plugin/;
 / {
@@ -8,16 +14,4 @@
             status = "disabled";
         };
     };
-	fragment@1 {
-		target-path = "/";
-		__overlay__ {
-			tft_gpio {
-				compatible = "tft,gpio";
-                status = "okay";
-                tft_a0 = <&gpio 25 1>; 
-                tft_rst = <&gpio 7 1>;  
-
-			};
-		};
-	};
 };

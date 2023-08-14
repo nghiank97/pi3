@@ -9,9 +9,12 @@ dt:
 	sudo dtoverlay spidev_disabler.dtbo
 	sudo modprobe industrialio
 	sudo dmesg | tail -n 10
+	dtc -@ -I dts -O dtb -o gpio_overlay.dtbo gpio_overlay.dts
+	sudo dtoverlay gpio_overlay.dtbo
 
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
+	rm -rf spidev_disabler.dtbo gpio_overlay.dtbo
 
 file := main
 

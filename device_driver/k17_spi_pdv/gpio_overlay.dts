@@ -1,0 +1,21 @@
+
+/*
+ * Device tree overlay for gpio
+ */
+
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "brcm,bcm2835";
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			tft_gpio {
+				compatible = "tft,gpio";
+				status = "okay";
+				tft_a0 = <&gpio 25 0>; 
+                tft_rst = <&gpio 7 0>; 
+			};
+		};
+	};
+};
