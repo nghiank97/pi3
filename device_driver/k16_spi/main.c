@@ -16,7 +16,6 @@ void tft18_put_str5x7(u08 X, u08 Y, char *str, u16 color);
 static int __init ModuleInit(void);
 static void __exit ModuleExit(void);
 
-
 #define MY_BUS_NUM 0
 static struct spi_device *tft_18_dev;
 u16 scr_width;
@@ -108,17 +107,17 @@ int tft18_init(void) {
 	tft18_write(0x3c); 	// Back porch: BPD5,BPD4,BPD3,BPD2
 
 	tft18_cmd(0xB4);   	// Display dot inversion control:
-	tft18_data(0x03);  // NLB,NLC
+	tft18_data(0x03);  	// NLB,NLC
 
 	tft18_cmd(0x3a);   	// Interface pixel format
-	tft18_data(0x05);  // 16-bit/pixel RGB 5-6-5 (65k colors)
+	tft18_data(0x05);  	// 16-bit/pixel RGB 5-6-5 (65k colors)
 
 	tft18_cmd(0x20);   	// Display inversion off
 
 	tft18_cmd(0x13);   	// Partial mode off
 
 	tft18_cmd(0x26);   	// Gamma curve set:
-	tft18_data(0x01);  // Gamma curve 1 (G2.2) or (G1.0)
+	tft18_data(0x01);  	// Gamma curve 1 (G2.2) or (G1.0)
 	tft18_cmd(0x29);   	// Display on
 
 	CS_H();
@@ -247,19 +246,19 @@ static int __init ModuleInit(void) {
 	master = spi_busnum_to_master(MY_BUS_NUM);
 	/* Check if we could get the master */
 	if(!master) {
-		printk("There is no spi bus with Nr. %d\n", MY_BUS_NUM);
+		printd("ERROR");
 		return -1;
 	}
 	/* Create new SPI device */
 	tft_18_dev = spi_new_device(master, &spi_device_info);
 	if(!tft_18_dev) {
-		printk("Could not create device!\n");
+		printd("ERROR");
 		return -1;
 	}
 	tft_18_dev -> bits_per_word = 8;
 	/* Setup the bus for device's parameters */
 	if(spi_setup(tft_18_dev) != 0){
-		printk("Could not change bus setup!\n");
+		printd("ERROR");
 		spi_unregister_device(tft_18_dev);
 		return -1;
 	}
@@ -269,7 +268,7 @@ static int __init ModuleInit(void) {
 
 	tft18_clear(0xFF00);
 	tft18_put_str5x7(128/2,160/2, "nghia@123", 0xFA83);
-	printk("Hello, Kernel!\n");
+	printd("INIT");
 	return 0;
 }
 /**
@@ -282,8 +281,7 @@ static void __exit ModuleExit(void) {
 	if(tft_18_dev){
 		spi_unregister_device(tft_18_dev);
     }
-
-	printk("Goodbye, Kernel\n");
+	printd("EXIT");
 }
 
 module_init(ModuleInit);
@@ -292,4 +290,4 @@ module_exit(ModuleExit);
 /* Meta Information */
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("knghia");
-MODULE_DESCRIPTION("a simple device");
+MODULE_DESCRIPTION("a simple tft-spi device");

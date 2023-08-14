@@ -19,13 +19,10 @@ To register the your spi, you should disable spi using device tree overlay
 ```cmd
 /dts-v1/;
 /plugin/;
-
 / {
     compatible = "brcm,bcm2708";
-
     fragment@0 {
         target = <&spidev0>;
-
         __overlay__ {
             status = "disabled";
         };

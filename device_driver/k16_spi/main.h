@@ -7,12 +7,10 @@
 #include <linux/types.h>
 #include <linux/slab.h>
 #include <linux/fs.h>
-#include <linux/interrupt.h>
 #include <linux/spi/spi.h>
 #include <linux/kthread.h>
 #include <linux/moduleparam.h>
 #include <asm/uaccess.h>
-#include <linux/delay.h>
 #include <linux/string.h>
 #include <linux/device.h>
 #include <linux/param.h>
@@ -89,17 +87,8 @@
 #define ST7735_GMCTRP1 0xE0
 #define ST7735_GMCTRN1 0xE1
 
-#define A0_pin  25
 #define CS0_pin 8
-#define RST_pin 7
 
-
-#define A0_H()       		(gpio_set_value(A0_pin,1))
-#define A0_L()      		(gpio_set_value(A0_pin,0))
-
-#define RST_H()       	    (gpio_set_value(RST_pin,1))
-#define RST_L()      		(gpio_set_value(RST_pin,0))
-		
 #define CS_H()       		(gpio_set_value(CS0_pin,1))
 #define CS_L()      		(gpio_set_value(CS0_pin,0))
 
@@ -112,14 +101,5 @@ typedef enum {
 
 #define scr_w       	128
 #define scr_h       	160
-
-
-// #define DRIVERNAME  "spidev"
-// #define DEVICENAME  "tft_18_class"
-// #define DEVICECLASS "tft_18_dev"
-// #define MAJORNO     154
-// #define MINORNO     0
-
-// #define BEGIN       11
 
 #endif
