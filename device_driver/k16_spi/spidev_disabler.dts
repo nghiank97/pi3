@@ -6,8 +6,8 @@
 
     fragment@0 {
         target = <&spidev0>;
+
         __overlay__ {
-            compatible = "spi,tft_18";
             status = "disabled";
         };
     };

@@ -1,7 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-
 #include <linux/module.h>
 #include <linux/cdev.h>
 #include <linux/kernel.h>
@@ -22,6 +21,9 @@
 #include <linux/list.h>
 #include <linux/gpio.h>
 #include <linux/delay.h>
+
+#include "font5x7.h"
+#include "garmin-digits.h"
 
 #define u08 uint8_t
 #define u16 uint16_t
@@ -101,12 +103,23 @@
 #define CS_H()       		(gpio_set_value(CS0_pin,1))
 #define CS_L()      		(gpio_set_value(CS0_pin,0))
 
-#define DRIVERNAME  "spidev"
-#define DEVICENAME  "tft_18_class"
-#define DEVICECLASS "tft_18_dev"
-#define MAJORNO     154
-#define MINORNO     0
+typedef enum {
+	scr_normal = 0,
+	scr_CW     = 1,
+	scr_CCW    = 2,
+	scr_180    = 3
+} ScrOrientation_TypeDef;
 
-#define BEGIN       11
+#define scr_w       	128
+#define scr_h       	160
+
+
+// #define DRIVERNAME  "spidev"
+// #define DEVICENAME  "tft_18_class"
+// #define DEVICECLASS "tft_18_dev"
+// #define MAJORNO     154
+// #define MINORNO     0
+
+// #define BEGIN       11
 
 #endif

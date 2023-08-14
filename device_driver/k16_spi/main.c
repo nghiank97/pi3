@@ -1,180 +1,295 @@
-#include <linux/module.h>
-#include <linux/fs.h>
-#include <linux/uaccess.h>
-#include <linux/init.h>
-#include <linux/slab.h>
-#include <linux/cdev.h>
-#include <linux/device.h>
-#include <linux/of.h>
-#include <linux/of_device.h>
-#include <linux/spi/spi.h>
+#include "main.h"
 
-#define SPI_CLASS_NAME              "mySPIClass"
-#define MY_DEVICE_NAME_0            "mySPI_slave-0"
-#define MY_DEVICE_MAX_DEVICES       (2)
-#define MY_DEVICE_USER_BUF_LENGTH   (32)
+#define printd(msg) printk("\t %s: %s:%d \n", msg, __func__, __LINE__);
 
-static dev_t my_device_dev_t;
-static struct device *my_device_dev;
-static struct cdev *my_device_cdev;
-static struct class *my_device_class;
-static struct spi_device *my_device_spi;
+int gpio_init(void);
+void tft18_cmd(u08 cmd);
+void tft18_data(u08 data);
+void tft18_write(u08 data);
+int tft18_init(void);
+void tft18_orientation(ScrOrientation_TypeDef orientation);
+void tff_add_set(u08 XS, u08 YS, u08 XE, u08 YE);
+void tft18_clear(u16 color);
+void tft18_pixel(u16 X, u16 Y, u16 color);
+void tft18_put_char5x7(u16 X, u16 Y, u08 chr, u16 color);
+void tft18_put_str5x7(u08 X, u08 Y, char *str, u16 color);
+static int __init ModuleInit(void);
+static void __exit ModuleExit(void);
 
-struct spi_transfer spi_element[] = {
-    {
-        .len = 2,
-        .cs_change = 0,
-    }, {
-        .len = 2,
-    },
-};
 
-static const struct of_device_id my_device_of_match[] = {
-    { 
-      .compatible = "vend,mySPI_slave_0", 
-      .data = (void *) 0,
-    },
-    { }
-};
-MODULE_DEVICE_TABLE(of, my_device_of_match);
+#define MY_BUS_NUM 0
+static struct spi_device *tft_18_dev;
+u16 scr_width;
+u16 scr_height;
 
-// (2) finding a match from stripped device-tree (no vendor part)
-static const struct spi_device_id my_device_id[] = {
-    { "mySPI_slave", 0 },
-    { }
-};
+int gpio_init(void){
+//   if(gpio_is_valid(CS0_pin) == false){
+//     printd("ERROR");
+//     return -1;
+//   }
+//   if(gpio_request(CS0_pin,"CS0_pin") < 0){
+//     printd("ERROR");
+//     return -1;
+//   }
+//   gpio_direction_output(CS0_pin, 0);
 
-MODULE_DEVICE_TABLE(spi, my_device_id);
+  if(gpio_is_valid(A0_pin) == false){
+    printd("ERROR");
+    return -1;
+  }
+  if(gpio_request(A0_pin,"A0_pin") < 0){
+    printd("ERROR");
+    return -1;
+  }
+  gpio_direction_output(A0_pin, 0);
 
-static int my_device_open(struct inode *inode, struct file *filp)
-{    
-    printk("mySPI_slave::my_device_open called.\n");
-    return 0;
+  if(gpio_is_valid(RST_pin) == false){
+    printd("ERROR");
+    return -1;
+  }
+  if(gpio_request(RST_pin,"RST_pin") < 0){
+    printd("ERROR");
+    return -1;
+  }
+  gpio_direction_output(RST_pin, 0);
+
+  A0_H();
+  RST_H();
+  return 0;
 }
 
-static int my_device_release(struct inode *inode, struct file *file)
-{
-    printk("mySPI_slave::my_device_release called.\n");
-    return 0;
+void tft18_write(u08 data) {
+	spi_write(tft_18_dev, &data, 1);
 }
 
-static ssize_t my_device_read(struct file *filp, char __user * buf, size_t lbuf, loff_t * ppos)
-{
-    printk("mySPI_slave::my_device_read called.\n");
-    return lbuf;
+void tft18_cmd(u08 cmd) {
+	A0_L();
+    tft18_write(cmd);
 }
 
-static ssize_t my_device_write(struct file *filep, const char __user * buf, size_t lbuf, loff_t * ppos)
-{
-    printk("mySPI_slave::my_device_write called.\n");
-    return lbuf;
+void tft18_data(u08 data) {
+	A0_H();
+	tft18_write(data);
 }
 
-static const struct file_operations my_device_fops = {
-    .owner =    THIS_MODULE,
-    .write =    my_device_write,
-    .read =        my_device_read,
-    .open =        my_device_open,
-    .release =    my_device_release
-};
+int tft18_init(void) {
+	// Reset display
+	CS_H();
+	RST_H();
+	mdelay(5);
+	RST_L();
+	mdelay(5);
+	RST_H();
+	CS_H();
+	mdelay(5);
+	CS_L();
 
+	tft18_cmd(ST7735_SLPOUT);	// Sleep out & booster on
+	mdelay(120);	
+	tft18_cmd(ST7735_FRMCTR1);	// In normal mode (full colors):
+	A0_H();
+	tft18_write(0x05);	// RTNA set 1-line period: RTNA2, RTNA0
+	tft18_write(0x3c);	// Front porch: FPA5,FPA4,FPA3,FPA2
+	tft18_write(0x3c);	// Back porch: BPA5,BPA4,BPA3,BPA2
 
-// Initialize SPI interface...
-static int my_device_probe(struct spi_device *spi)
-{
-    int err;
-    unsigned char ch16[] = {0x5A, 0x5A};    
-    unsigned char rx16[] = {0x00, 0x00};
-    int devData = 0;
-    printk("mySPI_slave::my_device_probe called.\n");
+	tft18_cmd(0xb2);	// In idle mode (8-colors):
+	A0_H();
+	tft18_write(0x05); 	// RTNB set 1-line period: RTNAB, RTNB0
+	tft18_write(0x3c); 	// Front porch: FPB5,FPB4,FPB3,FPB2
+	tft18_write(0x3c); 	// Back porch: BPB5,BPB4,BPB3,BPB2
 
-    spi->max_speed_hz = 10000000; // ?
-    spi->bits_per_word = 16;
-    spi->mode = (0);
-    
-    err = spi_setup(spi);
-    if (err < 0) {
-        printk("mySPI_slave::my_device_probe spi_setup failed!\n");
-        return err;
+	tft18_cmd(0xb3);   	// In partial mode + full colors:
+	A0_H();
+	tft18_write(0x05); 	// RTNC set 1-line period: RTNC2, RTNC0
+	tft18_write(0x3c); 	// Front porch: FPC5,FPC4,FPC3,FPC2
+	tft18_write(0x3c); 	// Back porch: BPC5,BPC4,BPC3,BPC2
+	tft18_write(0x05); 	// RTND set 1-line period: RTND2, RTND0
+	tft18_write(0x3c); 	// Front porch: FPD5,FPD4,FPD3,FPD2
+	tft18_write(0x3c); 	// Back porch: BPD5,BPD4,BPD3,BPD2
+
+	tft18_cmd(0xB4);   	// Display dot inversion control:
+	tft18_data(0x03);  // NLB,NLC
+
+	tft18_cmd(0x3a);   	// Interface pixel format
+	tft18_data(0x05);  // 16-bit/pixel RGB 5-6-5 (65k colors)
+
+	tft18_cmd(0x20);   	// Display inversion off
+
+	tft18_cmd(0x13);   	// Partial mode off
+
+	tft18_cmd(0x26);   	// Gamma curve set:
+	tft18_data(0x01);  // Gamma curve 1 (G2.2) or (G1.0)
+	tft18_cmd(0x29);   	// Display on
+
+	CS_H();
+
+	tft18_orientation(scr_normal);
+	return 0;
+}
+
+void tft18_orientation(ScrOrientation_TypeDef orientation) {
+	CS_L();
+	tft18_cmd(0x36); // Memory data access control:
+	switch(orientation) {
+	case scr_CW:
+		scr_width  = scr_h;
+		scr_height = scr_w;
+		tft18_data(0xA0); // X-Y Exchange,Y-Mirror
+		break;
+	case scr_CCW:
+		scr_width  = scr_h;
+		scr_height = scr_w;
+		tft18_data(0x60); // X-Y Exchange,X-Mirror
+		break;
+	case scr_180:
+		scr_width  = scr_w;
+		scr_height = scr_h;
+		tft18_data(0xc0); // X-Mirror,Y-Mirror: Bottom to top; Right to left; RGB
+		break;
+	default:
+		scr_width  = scr_w;
+		scr_height = scr_h;
+		tft18_data(0x00); // Normal: Top to Bottom; Left to Right; RGB
+		break;
+	}
+	CS_H();
+}
+
+void tff_add_set(u08 XS, u08 YS, u08 XE, u08 YE) {
+	tft18_cmd(0x2a); // Column address set
+	A0_H();
+	tft18_write(XS >> 8);
+	tft18_write(XS);
+	tft18_write(XE >> 8);
+	tft18_write(XE);
+
+	tft18_cmd(0x2b); // Row address set
+	A0_H();
+	tft18_write(YS >> 8);
+	tft18_write(YS);
+	tft18_write(YE >> 8);
+	tft18_write(YE);
+
+	tft18_cmd(0x2c); // Memory write
+}
+
+void tft18_clear(u16 color) {
+	u16 i;
+	CS_L();
+	tff_add_set(0,0,scr_width - 1,scr_height - 1);
+	A0_H();
+	for (i = 0; i < scr_width * scr_height; i++) {
+		tft18_write(0x00);
+		tft18_write(0x00);
+		tft18_write(0x00);
+	}
+	CS_H();
+}
+
+void tft18_pixel(u16 X, u16 Y, u16 color) {
+    CS_L();
+    tff_add_set(X,Y,X,Y);
+    A0_H();
+    tft18_write(color >> 8);
+    tft18_write((u08)color);
+    CS_H();
+}
+
+void tft18_put_char5x7(u16 X, u16 Y, u08 chr, u16 color) {
+	u16 i,j;
+	u08 buffer[5];
+	u08 CH = color >> 8;
+	u08 CL = (u08)color;
+	memcpy(buffer,&Font5x7[(chr - 32) * 5],5);
+	CS_L();
+	tff_add_set(X,Y,X + 4,Y + 6);
+	A0_H();
+	for (j = 0; j < 7; j++) {
+        for (i = 0; i < 5; i++) {
+    		if ((buffer[i] >> j) & 0x01) {
+    			tft18_write(CH);
+    			tft18_write(CL);
+    		} else {
+    			tft18_write(0x00);
+    			tft18_write(0x00);
+    		}
+    	}
     }
+	CS_H();
+}
 
-    printk("spi_setup ok, cs: %d\n", spi->chip_select);
-    printk("start data transfer...\n");
+void tft18_put_str5x7(u08 X, u08 Y, char *str, u16 color) {
+    while (*str) {
+        tft18_put_char5x7(X,Y,*str++,color);
+        if (X < scr_width - 6) { X += 6; } else if (Y < scr_height - 8) { X = 0; Y += 8; } else { X = 0; Y = 0; }
+    };
+}
 
-    spi_element[0].tx_buf = ch16;
-    spi_element[1].rx_buf = rx16;
+static int __init ModuleInit(void) {
+	struct spi_master *master;
+	/* Parameters for SPI device */
+	struct spi_board_info spi_device_info = {
+		.modalias = "tft_18_in",
+		.max_speed_hz = 4200000,
+		.bus_num = MY_BUS_NUM,
+		.chip_select = 0,
+		.mode = 1,
+	};
 
-    err = spi_sync_transfer(spi, spi_element, ARRAY_SIZE(spi_element));
-    printk("data size: %d\n", sizeof(rx16));
-    if (err < 0) {
-        printk("mySPI_slave::my_device_probe spi_sync_transfer failed!\n");
-        return err;
-    }
+	if (gpio_init() < 0){
+		printd("ERROR");
+		gpio_free(A0_pin);
+		gpio_free(RST_pin);
+		return -1;
+	}
 
-    my_device_spi = spi;
-    printk("transfer ok\n");
-    
-
-    // define a device class
-    my_device_class = class_create(THIS_MODULE, SPI_CLASS_NAME);
-    if (my_device_class == NULL) {
-        printk("mySPI_slave::my_device_probe class_create failed!\n");
+	/* Get access to spi bus */
+	master = spi_busnum_to_master(MY_BUS_NUM);
+	/* Check if we could get the master */
+	if(!master) {
+		printk("There is no spi bus with Nr. %d\n", MY_BUS_NUM);
+		return -1;
+	}
+	/* Create new SPI device */
+	tft_18_dev = spi_new_device(master, &spi_device_info);
+	if(!tft_18_dev) {
+		printk("Could not create device!\n");
+		return -1;
+	}
+	tft_18_dev -> bits_per_word = 8;
+	/* Setup the bus for device's parameters */
+	if(spi_setup(tft_18_dev) != 0){
+		printk("Could not change bus setup!\n");
+		spi_unregister_device(tft_18_dev);
+		return -1;
+	}
+    if (tft18_init() < 0){
         return -1;
     }
 
-    err = alloc_chrdev_region(&my_device_dev_t, 0, MY_DEVICE_MAX_DEVICES, MY_DEVICE_NAME_0);
-
-    if (err < 0) {
-        printk("mySPI_slave::my_device_probe alloc_chrdev_region failed!\n");
-        class_destroy(my_device_class);
-        return err;
-    }
-    
-    my_device_cdev = cdev_alloc();
-    if (!(my_device_cdev)) {
-        printk("mySPI_slave::my_device_probe cdev_alloc failed!\n");
-        unregister_chrdev_region(my_device_dev_t, MY_DEVICE_MAX_DEVICES);
-        class_destroy(my_device_class);
-        return -1;
-    }
-
-    cdev_init(my_device_cdev, &my_device_fops);
-
-    err = cdev_add(my_device_cdev, my_device_dev_t, MY_DEVICE_MAX_DEVICES);
-    if(err < 0) {
-        printk("mySPI_slave::my_device_probe cdev_add failed!\n");
-        cdev_del(my_device_cdev);
-        unregister_chrdev_region(my_device_dev_t, MY_DEVICE_MAX_DEVICES);
-        class_destroy(my_device_class);
-        return err;
+	tft18_clear(0xFF00);
+	tft18_put_str5x7(128/2,160/2, "nghia@123", 0xFA83);
+	printk("Hello, Kernel!\n");
+	return 0;
+}
+/**
+ * @brief This function is called, when the module is removed from the kernel
+ */
+static void __exit ModuleExit(void) {
+	tft18_clear(0x0000);
+	gpio_free(A0_pin);
+	gpio_free(RST_pin);
+	if(tft_18_dev){
+		spi_unregister_device(tft_18_dev);
     }
 
-    my_device_dev = device_create(my_device_class, NULL, my_device_dev_t, NULL, "%s", MY_DEVICE_NAME_0);
-    
-    return 0;
+	printk("Goodbye, Kernel\n");
 }
 
-static void my_device_remove(struct spi_device *spi)
-{
-    printk("my_device_remove() called.\n");
-    device_destroy(my_device_class, my_device_dev_t);
-    if(my_device_cdev) {
-        cdev_del(my_device_cdev);
-    }
-    unregister_chrdev_region(my_device_dev_t, MY_DEVICE_MAX_DEVICES);
-    class_destroy(my_device_class);
-}
+module_init(ModuleInit);
+module_exit(ModuleExit);
 
-static struct spi_driver my_device_spi_driver = {
-    .driver = {
-        .owner =    THIS_MODULE,
-        .name =        "mySPI_slave",
-        .of_match_table = of_match_ptr(my_device_of_match),
-    },
-    .id_table =    my_device_id,
-    .probe =    my_device_probe,
-    .remove =    my_device_remove
-};
-module_spi_driver(my_device_spi_driver);
-
+/* Meta Information */
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("knghia");
+MODULE_DESCRIPTION("a simple device");
