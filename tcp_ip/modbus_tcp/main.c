@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <modbus/modbus.h>
 #include <errno.h>
 #include <unistd.h>
@@ -23,15 +24,36 @@ u16 us_reg_input_buf[REG_INPUT_NREGS] = {0};
 #define REG_HOLDING_NREGS 	8
 u16 us_reg_holding_buf[REG_HOLDING_NREGS] = {1,2,3,4,5,6,7,8};
 
-int main(void){
+int main(int argc, char *argv[]){
+
+	printf("IP	: %s\n", argv[1]);
+	printf("Port	: %s\n", argv[2]);
+
 	modbus_t *ctx;
 	i08 status = 0;
 
-	ctx = modbus_new_tcp("192.168.7.99", 502);
+	ctx = modbus_new_tcp(argv[1], atoi((char*)argv[2]));
+	modbus_set_debug(ctx, TRUE);
 	sleep(1);
-	while(modbus_connect(ctx) == -1){
+
+	if (ctx == NULL) {
+		printf("Unable to allocate libmodbus context\n");
+		return -1;
+	}
+
+	status = modbus_set_slave(ctx, 1);
+	if (status == -1) {
+		printf("Invalid slave ID\n");
+		modbus_close(ctx);
+		modbus_free(ctx);
+		return -1;
+	}
+
+	if (modbus_connect(ctx) == -1){
 		printf("Error : %s\n", modbus_strerror(errno));
-		return 0;
+		modbus_close(ctx);
+		modbus_free(ctx);
+		return -1;
 	}
 
 	while(1){

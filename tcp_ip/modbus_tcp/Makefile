@@ -1,4 +1,6 @@
-#gcc main.c -o main $(pkg-config --libs --cflags libmodbus)
-run:
+
+c:
 	gcc main.c -o main -lmodbus
-	./main
+	./main "192.168.7.99" "502"
+py:
+	python3 main.py
