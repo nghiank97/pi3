@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "can_spi.h": "c",
+        "mcp2515.h": "c",
+        "main.h": "c",
+        "binary.h": "c"
+    }
+}
