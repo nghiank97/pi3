@@ -2,8 +2,13 @@
 
 # Install oldversion to using spi
 
-[install](https://downloads.raspberrypi.org/raspios_full_armhf/images/raspios_full_armhf-2022-09-26/)
+[version os](https://downloads.raspberrypi.org/raspios_full_armhf/images/raspios_full_armhf-2022-09-26/)
 
+```cmd
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install raspberrypi-kernel-headers
+```
 # Reference
 
 [Embetronicx](https://github.com/Embetronicx/Tutorials/tree/master/Linux/Device_Driver)
