@@ -19,14 +19,21 @@
 #include <linux/list.h>
 #include <linux/gpio.h>
 #include <linux/delay.h>
-#include <linux/mod_devicetable.h>
-#include <linux/property.h>
-#include <linux/platform_device.h>
-#include <linux/of_device.h>
-#include <linux/gpio/consumer.h>
+#include <linux/interrupt.h>
 
 #include "binary.h"
 #include "can_spi.h"
 #include "mcp2515.h"
+
+#define MCP2515_SPI_BUS     0
+#define MCP2515_INT_Pin     25
+#define MCP2515_CS_Pin      8
+#define MCP2515_CS_HIGH()   (gpio_set_value(MCP2515_CS_Pin, 1))
+#define MCP2515_CS_LOW()    (gpio_set_value(MCP2515_CS_Pin, 0))
+
+extern u16 SPI_Tx(u08 data);
+extern u16 SPI_TxBuffer(u08 *buffer, u16 length);
+extern u08 SPI_Rx(void);
+extern u16 SPI_RxBuffer(u08 *buffer, u16 length);
 
 #endif

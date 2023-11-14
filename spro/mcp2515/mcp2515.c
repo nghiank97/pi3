@@ -2,32 +2,10 @@
 #include "binary.h"
 #include "mcp2515.h"
 
-/* Pin 설정에 맞게 수정필요. Modify below items for your SPI configurations */
-#define SPI_CAN						&hspi1
-#define SPI_TIMEOUT                 0xFFFF
-#define MCP2515_CS_HIGH()   		HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET)
-#define MCP2515_CS_LOW()    		HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET)
-
-/* Prototypes */
-static void SPI_Tx(u08 data);
-static void SPI_TxBuffer(u08 *buffer, u08 length);
-static u08 SPI_Rx(void);
-static void SPI_RxBuffer(u08 *buffer, u08 length);
-
 /* MCP2515 초기화 */
 bool MCP2515_Initialize(void)
 {
   MCP2515_CS_HIGH();    
-  u08 loop = 10;
-  
-  do {
-    /* SPI Ready 확인 */
-    if(HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_READY)
-      return true;
-    
-    loop--;
-  } while(loop > 0); 
-      
   return false;
 }
 
@@ -224,30 +202,4 @@ void MCP2515_BitModify(u08 address, u08 mask, u08 data)
   SPI_Tx(data);
         
   MCP2515_CS_HIGH();
-}
-
-/* SPI Tx Wrapper 함수 */
-static void SPI_Tx(u08 data)
-{
-  HAL_SPI_Transmit(SPI_CAN, &data, 1, SPI_TIMEOUT);    
-}
-
-/* SPI Tx Wrapper 함수 */
-static void SPI_TxBuffer(u08 *buffer, u08 length)
-{
-  HAL_SPI_Transmit(SPI_CAN, buffer, length, SPI_TIMEOUT);    
-}
-
-/* SPI Rx Wrapper 함수 */
-static u08 SPI_Rx(void)
-{
-  u08 retVal;
-  HAL_SPI_Receive(SPI_CAN, &retVal, 1, SPI_TIMEOUT);
-  return retVal;
-}
-
-/* SPI Rx Wrapper 함수 */
-static void SPI_RxBuffer(u08 *buffer, u08 length)
-{
-  HAL_SPI_Receive(SPI_CAN, buffer, length, SPI_TIMEOUT);
 }

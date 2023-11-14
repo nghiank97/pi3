@@ -2,11 +2,6 @@
 #ifndef BINARY_h
 #define BINARY_h
 
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-#include <inttypes.h>
-
 #define u08 uint8_t
 #define u16 uint16_t
 #define u32 uint32_t
