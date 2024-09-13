@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "socket.h": "c",
+        "ads1220.h": "c",
+        "spi.h": "c",
+        "binary.h": "c"
+    }
+}
